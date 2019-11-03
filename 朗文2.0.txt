@@ -1,0 +1,642 @@
+
+// ==UserScript==
+// @name         朗文刷题脚本
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://www.ulearning.cn/upload/Scorm/ImportRoot/*
+// @match        https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7451
+// @match        https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7452
+// @match        https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7453
+// @match        https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7454
+// @match        https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7726
+// @match        https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7727
+// @match        https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7728
+// @match        https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7729
+// @match        https://www.ulearning.cn/umooc/scorm4th/runtime/structure.jsp
+// @match        https://www.ulearning.cn/umooc/scorm4th/runtime/progress.jsp
+// @grant        none
+// ==/UserScript==
+
+var pdii=0,pdjj=-1,ii,jj,kk,zz,xx,yy,g;
+var tiankong=["tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt","tttt"];
+function ff()
+{
+    ///////////////////选择选项mcss//mcms/////////////////////////////////////
+    if(questionType[0]=="mcss"||questionType[0]=="mcms")
+    {
+        if(window.location.href=="https://www.ulearning.cn/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1025274174343/p1025274174359.htm")
+        {
+            for(ii=0;ii<choiceId.length;ii++)
+                for(jj=0;jj<choiceId[ii].length;jj++)
+                    document.getElementsByName(choiceId[ii][jj])[0].checked=correctAnswer[ii][jj];
+            if(document.getElementById("SubmitButtons"))
+                window.location.href="javascript:onCheckAnswers()";
+            return 0;
+        }
+        for(ii=0;ii<questionId.length;ii++)
+            for(jj=0;jj<document.getElementsByName(questionId[ii]).length;jj++)
+                document.getElementsByName(questionId[ii])[jj].checked=correctAnswer[ii][jj];
+        if(document.getElementById("SubmitButtons"))
+            window.location.href="javascript:onCheckAnswers()";
+    }
+    else if(questionType[0]=="pd")
+    {
+        /////////////////////下拉选项pd/////////////////////////////////////
+        if(window.location.pathname[35]==1||window.location.pathname[35]==2)
+        {
+            for(ii=0;ii<document.getElementsByTagName("option").length-9;ii++)
+                if(ii<pdii)
+                    if(pdjj==0)
+                        document.getElementsByTagName("option")[ii+9].selected=correctAnswer[pdjj][ii];
+                    else
+                        document.getElementsByTagName("option")[ii+9].selected=correctAnswer[pdjj][ii%(pdii-correctAnswer[pdjj].length)];
+                else
+                {
+                    pdjj++;
+                    pdii=pdii+correctAnswer[pdjj].length;
+                    if(pdjj==0)
+                        document.getElementsByTagName("option")[ii+9].selected=correctAnswer[pdjj][ii];
+                    else
+                        document.getElementsByTagName("option")[ii+9].selected=correctAnswer[pdjj][ii%(pdii-correctAnswer[pdjj].length)];
+                }
+            if(document.getElementById("SubmitButtons"))
+                window.location.href="javascript:onCheckAnswers()";
+        }
+        else
+        {
+            for(ii=0;ii<document.getElementsByTagName("option").length;ii++)
+                if(ii<pdii)
+                    if(pdjj==0)
+                        document.getElementsByTagName("option")[ii].selected=correctAnswer[pdjj][ii];
+                    else
+                        document.getElementsByTagName("option")[ii].selected=correctAnswer[pdjj][ii%(pdii-correctAnswer[pdjj].length)];
+                else
+                {
+                    pdjj++;
+                    pdii=pdii+correctAnswer[pdjj].length;
+                    if(pdjj==0)
+                        document.getElementsByTagName("option")[ii].selected=correctAnswer[pdjj][ii];
+                    else
+                        document.getElementsByTagName("option")[ii].selected=correctAnswer[pdjj][ii%(pdii-correctAnswer[pdjj].length)];
+                }
+            if(document.getElementById("SubmitButtons"))
+                window.location.href="javascript:onCheckAnswers()";
+        }
+    }
+    else if(questionType[0]=="ti")
+    {
+        //////////////////////填空选项ti//////////////////////////////////////
+        for(ii=0;ii<questionId.length;ii++)
+            document.getElementsByName(questionId[ii])[0].value=tiankong[ii];
+        if(document.getElementById("SubmitButtons"))
+            window.location.href="javascript:onCheckAnswers()";
+    }
+    else if(questionType[0]=="fidd"||questionType[0]=="match")
+    {
+        ////////////////////拖动选项fidd//match//////////////////////////////
+        if(questionId[0].length>8)
+            for(ii=0;ii<correctAnswer.length;ii++)
+                for(jj=0;jj<correctAnswer[ii].length;jj++)
+                    document.getElementsByName(questionId[ii]+"_"+jj)[0].value=correctAnswer[ii][jj][0];
+        else if(questionId[0].length<=8)
+            for(ii=0;ii<correctAnswer.length;ii++)
+                for(jj=0;jj<correctAnswer[ii].length;jj++)
+                    if(jj<10)
+                        document.getElementsByName(questionId[ii]+"_"+0+jj)[0].value=correctAnswer[ii][jj][0];
+                    else
+                        document.getElementsByName(questionId[ii]+"_"+jj)[0].value=correctAnswer[ii][jj][0];
+        if(document.getElementById("SubmitButtons"))
+            window.location.href="javascript:onCheckAnswers()";
+    }
+}
+
+
+//////////////////跳转///////////////////////////////////////////////////////
+if(window.location.pathname=="/umooc/scorm4th/runtime/structure.jsp")
+{
+    for(zz=0;zz<document.getElementById('nodeWrap').children.length;zz++)
+        if(document.getElementById('nodeWrap').children[zz].className=="nodeTitleOn")
+            break;
+    if(zz==document.getElementById('nodeWrap').children.length)
+        setTimeout(function(){document.getElementById('nodeWrap').children[1].onclick();},100);
+}
+function tiaozhuan()
+{
+    if(document.getElementsByName('right').length)
+        window.location.href=document.getElementsByName('right')[0].parentNode.href;
+    else
+    {
+        for(xx=1;xx<parent.parent.frames["code"].document.getElementById('nodeWrap').children.length;xx++)
+            if(parent.parent.frames["code"].document.getElementById('nodeWrap').children[xx].className=="nodeTitleOn"&&xx<parent.parent.frames["code"].document.getElementById('nodeWrap').children.length-1)
+            {
+                ////////////////此处延时执行170秒///////////////////////////
+                setTimeout(function(){
+                    yy=parent.parent.frames["code"].document.getElementById('nodeWrap').children[xx+1].id.split('_')[1];
+                    setTimeout(function(){top.launchItem(yy, 0, 'curr');},100);
+                },170000);
+                break;
+            }
+
+        if(xx==parent.parent.frames["code"].document.getElementById('nodeWrap').children.length)
+        {
+            setTimeout(function(){parent.parent.frames["LMSFrame"].document.getElementsByClassName('minorBtn')[0].onclick();},170000);
+        }
+    }
+}
+//////////////选课/////////////////////////
+if(window.location.search=="?operation=studyReport&courseID=7451"||
+   window.location.search=="?operation=studyReport&courseID=7452"||
+   window.location.search=="?operation=studyReport&courseID=7453"||
+   window.location.search=="?operation=studyReport&courseID=7454"||
+   window.location.search=="?operation=studyReport&courseID=7726"||
+   window.location.search=="?operation=studyReport&courseID=7727"||
+   window.location.search=="?operation=studyReport&courseID=7728"||
+   window.location.search=="?operation=studyReport&courseID=7729")
+{
+    for(kk=0;kk<document.getElementsByClassName("thecuorse").length;kk++)
+    {
+        if(document.getElementsByClassName("thecuorse")[kk].getElementsByClassName("progress-pre course-over")[0].innerHTML[13]=="%")
+        {
+            setTimeout(function(){document.getElementsByClassName("thecuorse")[kk].getElementsByClassName("btn-primary title tsize14")[0].onclick();},100);
+            break;
+        }
+        if(document.getElementsByClassName("thecuorse")[kk].getElementsByClassName("progress-pre course-over")[0].innerHTML[14]=="%")
+            if(document.getElementsByClassName("thecuorse")[kk].getElementsByClassName("progress-pre course-over")[0].innerHTML[12]!=8&&document.getElementsByClassName("thecuorse")[kk].getElementsByClassName("progress-pre course-over")[0].innerHTML[12]!=9)
+            {
+                setTimeout(function(){document.getElementsByClassName("thecuorse")[kk].getElementsByClassName("btn-primary title tsize14")[0].onclick();},100);
+                break;
+            }
+    }
+    ///////////时间不足，补足时间////////////////
+    if(kk==document.getElementsByClassName("thecuorse").length)
+        for(g=0;g<document.getElementsByClassName("thecuorse").length;g++)
+            if(Number(document.getElementsByClassName("thecuorse")[g].children[2].children[0].innerHTML[0]+document.getElementsByClassName("thecuorse")[g].children[2].children[0].innerHTML[1])==0&&
+               Number(document.getElementsByClassName("thecuorse")[g].children[2].children[0].innerHTML[4]+document.getElementsByClassName("thecuorse")[g].children[2].children[0].innerHTML[5])<45)
+            {
+                document.getElementsByClassName("thecuorse")[g].children[4].children[0].onclick();
+                break;
+            }
+    if(g==document.getElementsByClassName("thecuorse").length)
+        window.location.href="https://www.ulearning.cn/umooc/learner/userInfo.do?operation=studentChangeInfo";
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720949/LEI1US_ModA/pg998329130078/p998329130468.htm")
+    tiankong=["How are you","Good morning","Great","and you","Good afternoon","Kate"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720950/LEI1US_ModA/pg994098396819/p996945067062.htm")
+    tiankong=["I'm","It's","He's","Are","Is","they're"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720950/LEI1US_ModA/pg994098396819/p994101308406.htm")
+    tiankong=["Is","They're","I am","he's","Are","we are"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720950/LEI1US_ModA/pg994098396819/p994104210882.htm")
+    tiankong=["an","What do they do","a","an","What does she do","What do you do"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720951/LEI1US_ModA/pg998329759265/p998329759921.htm")
+    tiankong=["Don't call","Don't send","Don't go","Don't forget","Please"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720951/LEI1US_ModA/pg998329759265/p998330659562.htm")
+    tiankong=["I","she","they","we","it","you"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720952/LEI1US_ModA/pg998331591671/p998331592562.htm")
+    tiankong=["woman","faxes","classes","boxes","computers","file"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720966/LEI1US_ModB/pg999187127437/p999273788234.htm")
+    tiankong=["Friday","Sunday","May","August","February","June","January","December"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720966/LEI1US_ModB/pg999187127437/p999273788359.htm")
+    tiankong=["Do","It's","doesn't have","have","has","Does"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720967/LEI1US_ModB/pg999278473187/p999797345843.htm")
+    tiankong=["His","her","Their","our","my","your"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720967/LEI1US_ModB/pg999278473187/p999797346218.htm")
+    tiankong=["Whose","her","mine","his","Whose","hers"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720968/LEI1US_ModB/pg999782160984/p999797775984.htm")
+    tiankong=["works","goes","eats","likes","has","goes","work","start","eat","like","have","see"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720968/LEI1US_ModB/pg999782160984/p999797776359.htm")
+    tiankong=["I don't","she doesn't","they don't","he does","I do","we don't"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720968/LEI1US_ModB/pg999782160984/p999797776609.htm")
+    tiankong=["He","her","She","them","He","it","They","it","She","him"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720969/LEI1US_ModB/pg999782382046/p999798098625.htm")
+    tiankong=["on","from","to","usually","at","today","on","to"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720969/LEI1US_ModB/pg999782382046/p999798099000.htm")
+    tiankong=["When does","Where do","What do","What kind","When do","What time does"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720970/LEI1US_ModB/pg999782744281/p999806814125.htm")
+    tiankong=["some","a","any","any","some","a","any","some"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720973/LEI1US_ModC/pg999784604203/p999892418656.htm")
+    tiankong=["I'm taking","He's working","I'm talking","she's not studying","Are you talking","They're studying"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720973/LEI1US_ModC/pg999784604203/p999892418906.htm")
+    tiankong=["speaks","has","need","watch","am working","like"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720973/LEI1US_ModC/pg999784604203/p999892419406.htm")
+    tiankong=["Celia","On the ninth floor","At 11 o'clock","The new budget","No, I don't","On your desk"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720975/LEI1US_ModC/pg999784604234/p1000313330578.htm")
+    tiankong=["are you going to eat","I'm going to meet","Is she going to study","is she going to do","are you going to be","are going to meet"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720976/LEI1US_ModC/pg999784604250/p1000129007968.htm")
+    tiankong=["next to","behind","between","by","in front of"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720976/LEI1US_ModC/pg999784604250/p1000129008984.htm")
+    tiankong=["I was","We were","I'm","she wasn't","Where were","were you"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720976/LEI1US_ModC/pg999784604250/p1000129009265.htm")
+    tiankong=["went","did you come","had","stayed","didn't see","Did you talk"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720977/LEI1US_ModC/pg999784604265/p1000130694156.htm")
+    tiankong=["can't","can","can't","can't","can't","can"];
+//////222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720983/LEI2US_ModA/pg998329130078/p1005859123968.htm")
+    tiankong=["we're","they're","he isn't","she isn't","Is he","we're","Is she","Are you"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720983/LEI2US_ModA/pg998329130078/p1005859124468.htm")
+    tiankong=["he is","they are","we do","it is","it isn't","I don't","I'm not","we don't"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720984/LEI2US_ModA/pg994098396819/p1005859124843.htm")
+    tiankong=["is","is","has","is","are","are","has"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720984/LEI2US_ModA/pg994098396819/p1006208400625.htm")
+    tiankong=["Who's","When does","Where","Where do","What kind of","Who do","Where do","Who"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720985/LEI2US_ModA/pg998329759265/p1006208401250.htm")
+    tiankong=["a","any","some","a","some","any","a","some"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720986/LEI2US_ModA/pg998331591671/p1006208401625.htm")
+    tiankong=["Were you","we weren't","I was","were you","she wasn't","were you","she was","It was"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720986/LEI2US_ModA/pg998331591671/p1006208401875.htm")
+    tiankong=["enjoyed","stayed","didn't visit","did you talk","didn't go","didn't see","a","some"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720986/LEI2US_ModA/pg998331591671/p1006208402125.htm")
+    tiankong=["began","came","didn't do","ate","put","didn't know","sent"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720986/LEI2US_ModA/pg998331591671/p1006208402250.htm")
+    tiankong=["I went","Who did you go","Did you stay","How was","did you do","went","took","I didn't go"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720987/LEI2US_ModA/pg998331592812/p1006208402375.htm")
+    tiankong=["have to","can","should","can","can't","can","don't have to","has to"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720990/LEI2US_ModB/pg999187127437/p1006209207328.htm")
+    tiankong=["goes","want","is talking","Is","waiting","is looking","has","is","sitting","are studying"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720990/LEI2US_ModB/pg999187127437/p1006209207578.htm")
+    tiankong=["belongs","has","don't like","doesn't have","does","taste","doesn't like","smells","don't remember"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720991/LEI2US_ModB/pg999278473187/p1006209207953.htm")
+    tiankong=["in front of","next to","between","under","near","on"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720991/LEI2US_ModB/pg999278473187/p1006209208203.htm")
+    tiankong=["on","to","right","right","minute","on","down","left"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720991/LEI2US_ModB/pg999278473187/p1006209208578.htm")
+    tiankong=["Wow","What","man","Whoops","Ouch","Mmm","You're kidding","Hurray"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720992/LEI2US_ModB/pg999782160984/p1006209208828.htm")
+    tiankong=["are you going to do","will you be","He's going to see","is he going to see","They're going to go","will they be","are we going to drive","I'll call"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720992/LEI2US_ModB/pg999782160984/p1006209209203.htm")
+    tiankong=["Happy birthday","Happy anniversary","Congratulations","great","sorry","sorry","miss","care"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720993/LEI2US_ModB/pg999782382046/p1006209209578.htm")
+    tiankong=["do","make","make","do","does","did","made","make"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720993/LEI2US_ModB/pg999782382046/p1006209210078.htm")
+    tiankong=["cereal","the tomatoes","the phone","rice","cheese","the crackers","a box","a knife"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/720994/LEI2US_ModB/pg999782744281/p1006209210328.htm")
+    tiankong=["playing","to ask","to speak","to have","to leave","to go","listening","calling"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721008/LEI2US_ModC/pg999784604203/p1006209982437.htm")
+    tiankong=["I was watching","I wasn't working","I was making","were you talking","is she doing","was she doing"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721008/LEI2US_ModC/pg999784604203/p1006209982812.htm")
+    tiankong=["had","ate","didn't go","invited","rained","tried","lose","found"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721008/LEI2US_ModC/pg999784604203/p1006209983062.htm")
+    tiankong=["was writing","forgot","was running","went","got","was","wasn't"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721009/LEI2US_ModC/pg999784604218/p1006209983312.htm")
+    tiankong=["is older than","are younger than","is bigger than","has a better view than","is smaller than","is happier","is more expensive than"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721010/LEI2US_ModC/pg999784604234/p1006209984062.htm")
+    tiankong=["the prettiest","the most polite","the biggest","the worst","the best","the most beautiful","more interesting","as nice"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721010/LEI2US_ModC/pg999784604234/p1006209984187.htm")
+    tiankong=["an","the","the","the","a","the","-","the"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721010/LEI2US_ModC/pg999784604234/p1006209984312.htm")
+    tiankong=["an apartment","some nice restaurants","a park","the subway","a cup","The beaches","the U.K.","Mexico"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721010/LEI2US_ModC/pg999784604234/p1006209984562.htm")
+    tiankong=["she","His","they","her","Ours","Hers","mine","theirs"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721011/LEI2US_ModC/pg999784604250/p1006209984687.htm")
+    tiankong=["What kind","Who's","Who","How much","Where","When","What","How"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721011/LEI2US_ModC/pg999784604250/p1006209985312.htm")
+    tiankong=["doesn't she","doesn't it","aren't you","is he","weren't you","didn't you","are they","do we"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721012/LEI2US_ModC/pg999784604265/p1006209985562.htm")
+    tiankong=["I've been","I've thought","I've talked","he hasn't told","we've been","I haven't sent"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721012/LEI2US_ModC/pg999784604265/p1006209986062.htm")
+    tiankong=["He drives","It's raining","we're eating","I'll help","She's been","she didn't believe","He died","I like"];
+//////////////////3333333333333333333333333333333333333333333333333333333333333333333333333333333
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892449281/p1023892450265.htm")
+    tiankong=["knows","has been having","took","sat out","lost","is trying","will not allow","moved","has been playing","has known","gives","trust","will clear up","hope","will lose"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892449281/p1023892451531.htm")
+    tiankong=["Isn't it","Yes, it is","Aren't you","No, I'm not","Don't you like","No, I don't","Isn't it","Yes, it is"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892449281/p1024511412609.htm")
+    tiankong=["doesn't he","Yes, he does","isn't it","No, it isn't","does she","Yes, she does","shouldn't we","Yes, we should"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892449281/p1023892452765.htm")
+    tiankong=["invited her to come to dinner Friday night","expects him to arrive at the airport at 7:00 tonight","agreed to be at the office at 8:00","reminded him to call at 3:00","would like to have a cup of coffee","forgot to call Jackie"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892453093/p1023892453375.htm")
+    tiankong=["an","a","A","but","The","and"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892453093/p1023892453921.htm")
+    tiankong=["a","And","the","a","an","But"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1029173336171/p1029174525515.htm")
+    tiankong=["il","un","in","im"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1029173336171/p1029174526140.htm")
+    tiankong=["a","but","an"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721034/LEI4US_ModA/pg1025018299000/p1025018299984.htm")
+    tiankong=["was built","was added","was hired","joined","were bought","were repainted"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721034/LEI4US_ModA/pg1025018299000/p1025279006953.htm")
+    tiankong=["is managed","was repaired","are cleaned","is kept","is invited","was raised"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721034/LEI4US_ModA/pg1025018299000/p1025018301250.htm")
+    tiankong=["many","a little","much","a little","a few","a few"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721034/LEI4US_ModA/pg1025018299000/p1025018302484.htm")
+    tiankong=["worrying","to do","to do","washing","to do","to make","to check","doing"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721035/LEI4US_ModA/pg1025186464765/p1025186465750.htm")
+    tiankong=["'ve won","have","been acting","'ve worked","Have","lived","'ve done","'ve driven","'ve worn","'ve used"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721035/LEI4US_ModA/pg1025186464765/p1025186467015.htm")
+    tiankong=["where Valentino's is.","if they accept credit cards?","if the restaurant was full last night.","what kind of food they serve.","when they opened.","if we need a reservation.","if they serve lunch?","how we get there."];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721035/LEI4US_ModA/pg1025186464765/p1025186468250.htm")
+    tiankong=["interesting","tired","boring","satisfied","exciting","inspired","amazing","interested"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721035/LEI4US_ModA/pg1029177152281/p1029177153265.htm")
+    tiankong=["has been","have been taking","interesting","has taken","exciting","have acted","surprised"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1025274167015/p1025274169265.htm")
+    tiankong=["each other","himself","yourself","myself","each other","one another","themselves","yourselves"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1025274167015/p1025274170500.htm")
+    tiankong=["might have existed","couldn't have had","could have built","may have played","must have been","might not have been"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1025274170828/p1025274172843.htm")
+    tiankong=["we've","might have","may have","couldn't have","I've"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1025274170828/p1025274173390.htm")
+    tiankong=["you've","could have","may have","I've","must have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1029179373328/p1029179374671.htm")
+    tiankong=["we've","you've","could have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721015/LEI3US_ModA/pg1015861740171/p1015868453812.htm")
+    tiankong=["Let's","comparing","compare","How about","Why don't you","get","meet","meeting"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721015/LEI3US_ModA/pg1015861740171/p1015861741218.htm")
+    tiankong=["'m working","'m doing","wait","goes","'m taking","'re learning"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721015/LEI3US_ModA/pg1015861744765/p1015861745515.htm")
+    tiankong=["Gina","Gina","Sara","Gina","Sara","Gina","Gina","Gina","Sara","Sara"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721015/LEI3US_ModA/pg1021557227140/p1021559416750.htm")
+    tiankong=["lifestyle","money","schedule","retirement"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721015/LEI3US_ModA/pg1021557227140/p1021559416250.htm")
+    tiankong=["am taking","work","have","am writing"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721016/LEI3US_ModA/pg1015956098375/p1015956099406.htm")
+    tiankong=["haven't emailed","'ve been","Have","heard","'s fallen","'s","felt","Has","happened","Have","taken","'ve","done"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721017/LEI3US_ModA/pg1017946862484/p1017946863531.htm")
+    tiankong=["'ve been","'s written","came","saw","'ve loved","'ve had"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721017/LEI3US_ModA/pg1021571803062/p1021573530468.htm")
+    tiankong=["came","have been","has known","took"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721018/LEI3US_ModA/pg1017090961140/p1017090965000.htm")
+    tiankong=["an","the","a","a","The","the","the","a","the","The","a","The","a","The","a","the"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721018/LEI3US_ModA/pg1017090968984/p1024511115046.htm")
+    tiankong=["B","A"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721018/LEI3US_ModA/pg1017090968984/p1024581219921.htm")
+    tiankong=["2","3","1"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721018/LEI3US_ModA/pg1021571803078/p1021574175296.htm")
+    tiankong=["a","the","the","a"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721021/LEI3US_ModB/pg1018369427109/p1018369430703.htm")
+    tiankong=["so","such a","so","such","so","such an","so","such a"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721021/LEI3US_ModB/pg1018369427109/p1018369428156.htm")
+    tiankong=["think","'s","believe","wants","'s trying","sounds","'s","do","mean","Are","letting","know","don't understand","Do","have","'m","'s putting","like"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721022/LEI3US_ModB/pg1018628905125/p1018628907328.htm")
+    tiankong=["may be","might","might not","might not","could be","might not","could"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721022/LEI3US_ModB/pg1018628905125/p1018628906171.htm")
+    tiankong=["Taking","gambling","believing","Playing","ruining","investigating","hoping","Finding"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721022/LEI3US_ModB/pg1018628905125/p1018628905875.htm")
+    tiankong=["exercising","Running","is","Taking","is","spending","Putting","swimming","getting"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721022/LEI3US_ModB/pg1018628912718/p1018628912734.htm")
+    tiankong=["hat","he","h","ho","her"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721023/LEI3US_ModB/pg1018988069859/p1018988069875.htm")
+    tiankong=["analyze","announce","propose","combine","criticize","develop","press","appoint","react","recommend"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721023/LEI3US_ModB/pg1018988072968/p1018988076562.htm")
+    tiankong=["lighter than","faster","softer than","softer","more comfortable","nicer than","less expensive than","better"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721023/LEI3US_ModB/pg1018988072968/p1018988075171.htm")
+    tiankong=["try on","to meet","pay","to stay","to watch","work","go","to hear"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721023/LEI3US_ModB/pg1018988072968/p1018988074015.htm")
+    tiankong=["was","working","came","was leaving","asked","were","doing","was listening","was talking"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721023/LEI3US_ModB/pg1021571803125/p1023374129281.htm")
+    tiankong=["was checking","was playing","was explaining","were having"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721024/LEI3US_ModB/pg1019072762437/p1019072764640.htm")
+    tiankong=["where it is?","what I should wear.","what time she gets to the office?","how much they cost.","who took this photograph of us?","why Mark moved.","how many people Josh invited to his party?"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721024/LEI3US_ModB/pg1019072762437/p1019072763484.htm")
+    tiankong=["used to work","used to take","never used to drink","used to live","used to play","used to be","never used to go","used to be"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721024/LEI3US_ModB/pg1019072766484/p1019072767312.htm")
+    tiankong=["for","at","of","to","to"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721024/LEI3US_ModB/pg1019072766484/p1019072766765.htm")
+    tiankong=["to","for","at","of","for"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721027/LEI3US_ModC/pg1019248892671/p1019248893718.htm")
+    tiankong=["was working","got","saw","said","stopped","entered","arrived","listened","was running","fell","fell","injured","were having","offered","made","said"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721027/LEI3US_ModC/pg1019248896718/p1019248899312.htm")
+    tiankong=["time is it","It's almost","someone else at","heard of it","get it"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721027/LEI3US_ModC/pg1019248896718/p1019248898765.htm")
+    tiankong=["name isn't on","mind if I","Have a","find her","at all"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721027/LEI3US_ModC/pg1019248900265/p1020450806815.htm")
+    tiankong=["2","4","1","5","3","6"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721027/LEI3US_ModC/pg1021571803156/p1023458729875.htm")
+    tiankong=["works in an office","leave in a","met her in"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721027/LEI3US_ModC/pg1021571803156/p1023458729500.htm")
+    tiankong=["called","was watching","was","met"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721028/LEI3US_ModC/pg1019248943500/p1019248947093.htm")
+    tiankong=["will make","gets","has","will call","goes","will watch","will leave","is","will wash","leaves","does","will listen","goes","will buy","will read","takes"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721028/LEI3US_ModC/pg1019248943500/p1019248945703.htm")
+    tiankong=["joining","to become","to give","playing","being","kicking","working out","to get"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721029/LEI3US_ModC/pg1019248993750/p1019248994546.htm")
+    tiankong=["sorts","control","place","this world","date","question","it","way","blue","work"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721029/LEI3US_ModC/pg1019248996875/p1019249000468.htm")
+    tiankong=["interested","satisfying","interesting","boring","pleased","entertaining","surprised","disappointed"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721029/LEI3US_ModC/pg1019248996875/p1019248997921.htm")
+    tiankong=["to take out $1,000 OR in order to take out $1,000","to get a haircut OR in order to get a haircut","to watch the 6:00 news OR in order to watch the 6:00 news","to meet Dean at 1:00 OR in order to meet Dean at 1:00","to make a lunch reservation OR in order to make a lunch reservation","to work out OR in order to work out","to buy a new suit OR in order to buy a new suit"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721029/LEI3US_ModC/pg1021571803187/p1023477074468.htm")
+    tiankong=["interesting","surprised","disappointed"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721030/LEI3US_ModC/pg1019249087578/p1019249088625.htm")
+    tiankong=["have been reading","has been playing","has been putting","has been defending","have been saying","has been having","has been trying"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721030/LEI3US_ModC/pg1019249087578/p1019249089781.htm")
+    tiankong=["bring it up","let my team down","help them out","sit games out","pick it up","sign her up","set it up","give something back"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721030/LEI3US_ModC/pg1019249087578/p1019249091171.htm")
+    tiankong=["the biggest","the worst","the nicest","the most important","the best","the quietest","the least expensive","the earliest"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721030/LEI3US_ModC/pg1019249091625/p1019249091906.htm")
+    tiankong=["pr","sc","gl","cr","st","spr"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721030/LEI3US_ModC/pg1019249091625/p1019249092453.htm")
+    tiankong=["br","tr","pl","bl","cl","str"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721030/LEI3US_ModC/pg1021571803203/p1023479028343.htm")
+    tiankong=["pl","cr","str"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721694/LEI3US_ModC/pg1024521712828/p1024521717593.htm")
+    tiankong=["calling","was taking","will go"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721694/LEI3US_ModC/pg1024521712828/p1024521718718.htm")
+    tiankong=["br","str"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721027/LEI3US_ModC/pg1019248892671/p1019248896265.htm")
+    tiankong=["isn't as experienced as","isn't as old","is as good as","is as tall as","isn't as heavy","isn't as young as","isn't as selfish","isn't as good as"];
+
+////////////////4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892449281/p1023892452765.htm")
+    tiankong=["invited her to come to dinner Friday night","expects him to arrive at the airport at 7:00 tonight","agreed to be at the office at 8:00","reminded him to call at 3:00","would like to have a cup of coffee","forgot to call Jackie"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892449281/p1024511412609.htm")
+    tiankong=["doesn't he","Yes, he does","isn't it","No, it isn't","does she","Yes, she does","shouldn't we","Yes, we should"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892449281/p1023892451531.htm")
+    tiankong=["Isn't it","Yes, it is","Aren't you","No, I'm not","Don't you like","No, I don't","Isn't it","Yes, it is"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892449281/p1023892450265.htm")
+    tiankong=["knows","has been having","took","sat out","lost","is trying","will not allow","moved","has been playing","has known","gives","trust","will clear up","hope","will lose"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892453093/p1023892453921.htm")
+    tiankong=["a","And","the","a","an","But"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1023892453093/p1023892453375.htm")
+    tiankong=["an","a","A","but","The","and"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1029173336171/p1029174525515.htm")
+    tiankong=["il","un","in","im"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721033/LEI4US_ModA/pg1029173336171/p1029174526140.htm")
+    tiankong=["a","but","an"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721034/LEI4US_ModA/pg1025018299000/p1025018302484.htm")
+    tiankong=["worrying","to do","to do","washing","to do","to make","to check","doing"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721034/LEI4US_ModA/pg1025018299000/p1025018301250.htm")
+    tiankong=["many","a little","much","a little","a few","a few"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721034/LEI4US_ModA/pg1025018299000/p1025279006953.htm")
+    tiankong=["is managed","was repaired","are cleaned","is kept","is invited","was raised"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721034/LEI4US_ModA/pg1025018299000/p1025018299984.htm")
+    tiankong=["was built","was added","was hired","joined","were bought","were repainted"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721035/LEI4US_ModA/pg1025186464765/p1025186468250.htm")
+    tiankong=["interesting","tired","boring","satisfied","exciting","inspired","amazing","interested"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721035/LEI4US_ModA/pg1025186464765/p1025186467015.htm")
+    tiankong=["where Valentino's is.","if they accept credit cards?","if the restaurant was full last night.","what kind of food they serve.","when they opened.","if we need a reservation.","if they serve lunch?","how we get there."];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721035/LEI4US_ModA/pg1025186464765/p1025186465750.htm")
+    tiankong=["'ve won","have","been acting","'ve worked","Have","lived","'ve done","'ve driven","'ve worn","'ve used"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721035/LEI4US_ModA/pg1029177152281/p1029177153265.htm")
+    tiankong=["has been","have been taking","interesting","has taken","exciting","have acted","surprised"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1025274167015/p1025274170500.htm")
+    tiankong=["might have existed","couldn't have had","could have built","may have played","must have been","might not have been"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1025274167015/p1025274169265.htm")
+    tiankong=["each other","himself","yourself","myself","each other","one another","themselves","yourselves"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1025274170828/p1025274173390.htm")
+    tiankong=["you've","could have","may have","I've","must have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1025274170828/p1025274172843.htm")
+    tiankong=["we've","might have","may have","couldn't have","I've"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721036/LEI4US_ModA/pg1029179373328/p1029179374671.htm")
+    tiankong=["we've","you've","could have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721037/LEI4US_ModA/pg1029775739515/p1029775740734.htm")
+    tiankong=["attractive","sane"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721037/LEI4US_ModA/pg1029775739515/p1029775742093.htm")
+    tiankong=["have been working","have decided"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721037/LEI4US_ModA/pg1029775739515/p1029775743093.htm")
+    tiankong=["might have","was"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721049/LEI4US_ModB/pg1025545637156/p1025545640703.htm")
+    tiankong=["we hire a dessert chef, we'll interview more people","Customers will want to try the new desserts","they see them","DiCaprio is going to be in this neighborhood","he shoots his next movie here","people find out, the restaurant will get a lot of business","the waiter brings the milk, the coffee will be cold","the waiter brings us more coffee, I'll ask for the check"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721049/LEI4US_ModB/pg1025545637156/p1025545639421.htm")
+    tiankong=["Neither have","So do","So do","Neither can","Neither does","So will","Neither do","So am"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721049/LEI4US_ModB/pg1025545637156/p1025545638156.htm")
+    tiankong=["helped","explain","to try","had","let","make"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721049/LEI4US_ModB/pg1025545641078/p1025545641343.htm")
+    tiankong=["so excited","I adore","me out","He always","to a"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721049/LEI4US_ModB/pg1025545641078/p1025545641890.htm")
+    tiankong=["I even","Do I","see a","be a","go out"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721049/LEI4US_ModB/pg1029179374937/p1029179376015.htm")
+    tiankong=["free on","busy in","me at"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721050/LEI4US_ModB/pg1027955736781/p1027955740390.htm")
+    tiankong=["who is","who work","that has","that leaves","who is","who own","that was","who was"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721050/LEI4US_ModB/pg1027955736781/p1027955739078.htm")
+    tiankong=["her to look","not to order","her to be","her not to worry","her to tell her","not to leave","her not to tell","Amy to trust her"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721050/LEI4US_ModB/pg1027955736781/p1027955737781.htm")
+    tiankong=["occurred","was traveling","turned","didn't stop","changed","was talking","hit","arrived","treated"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721051/LEI4US_ModB/pg1028048794171/p1028048797781.htm")
+    tiankong=["to talk","to cry","to hear","to admit","to believe","to be","to have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721051/LEI4US_ModB/pg1028048794171/p1028048796468.htm")
+    tiankong=["hadn't gotten","hadn't given up","hadn't thought","suggested","hired","hadn't taken","offered","'d studied"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721051/LEI4US_ModB/pg1028048794171/p1028048795171.htm")
+    tiankong=["have","won't be","play","'ll be","hears","'ll let","won't win","don't play","phone","'ll feel"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721051/LEI4US_ModB/pg1029180740796/p1029180741718.htm")
+    tiankong=["'ll have to","to have","leave","hadn't looked","to talk"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721051/LEI4US_ModB/pg1029180740796/p1029180741593.htm")
+    tiankong=["have","had not thought","mentioned","to go","'ll be"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721052/LEI4US_ModB/pg1028126468546/p1028126472156.htm")
+    tiankong=["told","they hadn't made their","said","he planned to make","said","had changed","the day before","told","were looking forward","said","had built","said","he didn't know"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721052/LEI4US_ModB/pg1028126468546/p1028126470843.htm")
+    tiankong=["have it delivered","have it copied","have it repaired","have it cleaned","have it painted","has it done"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721052/LEI4US_ModB/pg1028126468546/p1028126469546.htm")
+    tiankong=["was going to call","were going to prove","was going to play","were going to celebrate","was going to watch","was going to go"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721052/LEI4US_ModB/pg1028126472546/p1028126472812.htm")
+    tiankong=["decided","relief","admitted","incredible","amazing"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721052/LEI4US_ModB/pg1028126472546/p1028126473359.htm")
+    tiankong=["exciting","record","believe","exactly","remember"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721052/LEI4US_ModB/pg1029180742500/p1029180743593.htm")
+    tiankong=["re","in","be"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721053/LEI4US_ModB/pg1030716467906/p1030716475171.htm")
+    tiankong=["relief","exciting"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721053/LEI4US_ModB/pg1030716467906/p1030716475046.htm")
+    tiankong=["to a","try it"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721053/LEI4US_ModB/pg1030716467906/p1030716474546.htm")
+    tiankong=["don't show up","'ll call"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721055/LEI4US_ModC/pg1029333676843/p1029333677843.htm")
+    tiankong=["were","hadn't asked","would return","could give","hadn't helped","had asked","knew","would keep quiet"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721055/LEI4US_ModC/pg1029333680843/p1029333683421.htm")
+    tiankong=["could","would","can","will","'ll"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721055/LEI4US_ModC/pg1029333680843/p1029333682875.htm")
+    tiankong=["could","'d","will","could","would"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721055/LEI4US_ModC/pg1031067194031/p1031067195250.htm")
+    tiankong=["could","would","'ll"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721055/LEI4US_ModC/pg1031067194031/p1031067195125.htm")
+    tiankong=["want to","supposed to be","have to"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721055/LEI4US_ModC/pg1031067194031/p1031067195000.htm")
+    tiankong=["had not let","would stop","hadn't messed up","to lose","would have known","was"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721056/LEI4US_ModC/pg1029334110406/p1029334114015.htm")
+    tiankong=["should have asked","shouldn't have given","should have been","should have gone","shouldn't have happened","should have known"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721056/LEI4US_ModC/pg1029334110406/p1029334112703.htm")
+    tiankong=["moved","had been working","decided","had been watching","had been throwing","reported","became","had been covering"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721056/LEI4US_ModC/pg1029334110406/p1029334111406.htm")
+    tiankong=["were","'d stay","had","could send","told","would not believe","were","would get","didn't have","would join","would take","had"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721056/LEI4US_ModC/pg1029334114406/p1029334114671.htm")
+    tiankong=["couldn't have","shouldn't have","couldn't have","should have","would have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721056/LEI4US_ModC/pg1029334114406/p1029334115218.htm")
+    tiankong=["could have","could have","wouldn't have","shouldn't have","wouldn't have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721056/LEI4US_ModC/pg1029334114406/p1029334116453.htm")
+    tiankong=["got you","could you","did your","Would you","Wouldn't you"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721056/LEI4US_ModC/pg1029334114406/p1029334117000.htm")
+    tiankong=["did you","got your","didn't you","Don't you","Would you"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721056/LEI4US_ModC/pg1031067195515/p1031067196734.htm")
+    tiankong=["got you","Would you","Don't you"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721056/LEI4US_ModC/pg1031067195515/p1031067196609.htm")
+    tiankong=["should have","couldn't have","wouldn't have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721057/LEI4US_ModC/pg1029334638203/p1029334639218.htm")
+    tiankong=["will be reporting","will be giving","'ll be getting","'ll be playing","won't be playing","will be spending"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721057/LEI4US_ModC/pg1029334638203/p1029334640515.htm")
+    tiankong=["that they needed","that Newsline aired last night","that I want to watch","that everyone likes the best","that she has always wanted","that she likes a lot"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721057/LEI4US_ModC/pg1029334638203/p1029334641828.htm")
+    tiankong=["must know","ought to be congratulated","can't be trusted","can't be allowed","can be learned","must be limited","can be measured","may use","has to be kept","have to respect"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721057/LEI4US_ModC/pg1029334642234/p1029334643046.htm")
+    tiankong=["ld","st","nds","thl","nst","xpl"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721057/LEI4US_ModC/pg1029334642234/p1029334642500.htm")
+    tiankong=["lp","ct","xt","nk","gr","xcl"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721057/LEI4US_ModC/pg1031067197000/p1031067198093.htm")
+    tiankong=["explained","described","surprise"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721058/LEI4US_ModC/pg1029335505812/p1029335509437.htm")
+    tiankong=["came out","let Tony down","turned it down","keep on","help her out","called Nick up","dropped by","clear it up","left anything out","turned out"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721058/LEI4US_ModC/pg1029335505812/p1029335508125.htm")
+    tiankong=["did","does","should","will","have","am","did","did"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721058/LEI4US_ModC/pg1029335505812/p1029335506828.htm")
+    tiankong=["that might move to Chicago","where I grew up","that Los Angeles and New York have","that I went to school with","that I really disliked about Chicago","when it snowed in May","who should be talking to you about Chicago","where I work"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721059/LEI4US_ModC/pg1031156920781/p1031156979734.htm")
+    tiankong=["yourself","explain","stir"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721059/LEI4US_ModC/pg1031156920781/p1031156979609.htm")
+    tiankong=["Would you","will"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721059/LEI4US_ModC/pg1031156920781/p1031156979468.htm")
+    tiankong=["could have","shouldn't have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721059/LEI4US_ModC/pg1031156920781/p1031156979093.htm")
+    tiankong=["'d been trying","'ll be leaving"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721695/LEI4US_ModC/pg1031690429484/p1031254793000.htm")
+    tiankong=["be","nds","could","did"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721695/LEI4US_ModC/pg1031690429484/p1031254792750.htm")
+    tiankong=["I have","This is","want to","should have"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721695/LEI4US_ModC/pg1031690429484/p1031254791875.htm")
+    tiankong=["were","told","playing","had"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721055/LEI4US_ModC/pg1029333676843/p1029333679140.htm")
+    tiankong=["had been","would have gotten","could have recorded","had pushed","hadn't heard","wouldn't have known","had gotten","would have heard","would not have arrived","had known","had not talked","wouldn't have found out"];
+if(window.location.pathname=="/upload/Scorm/ImportRoot/721055/LEI4US_ModC/pg1029333676843/p1029333680453.htm")
+    tiankong=["is supposed to remain","were supposed to visit","was supposed to get","was supposed to press","is supposed to begin","were supposed to celebrate"];
+
+
+
+if(window.location.href.length==102||window.location.href.length==101||window.location.href.length==100)
+{
+    setTimeout(function(){
+        try{ff();}
+        catch(e){}
+        setTimeout(function(){tiaozhuan();},100);
+    },200);
+    //190秒刷新
+    var mm3=window.location.href;
+    setTimeout(function(){if(window.location.href==mm3)parent.parent.location.reload();},190000);
+
+}
+
+
+
+/////////////5秒刷新
+var ss;
+setTimeout(function(){
+    if(window.location.href.length==60||window.location.href.length==83)
+    {
+        var mm1=window.location.href;
+        setTimeout(function(){if(window.location.href==mm1)parent.parent.location.reload();},5000);
+    }
+    if(window.location.href.length==102||window.location.href.length==101||window.location.href.length==100)
+        if(document.getElementsByName('right').length===0)
+            for(ss=1;ss<parent.parent.frames["code"].document.getElementById('nodeWrap').children.length;ss++)
+                if(parent.parent.frames["code"].document.getElementById('nodeWrap').children[ss].className=="nodeTitleOn")break;
+    if(ss==parent.parent.frames["code"].document.getElementById('nodeWrap').children.length)
+    {
+        var mm2=window.location.href;
+        setTimeout(function(){if(window.location.href==mm2)parent.parent.location.reload();},5000);
+    }
+},100);
+
+
+

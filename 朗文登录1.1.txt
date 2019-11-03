@@ -1,0 +1,166 @@
+// ==UserScript==
+// @name         朗文登录
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://www.ulearning.cn/ulearning_web/indexStatic.jsp
+// @match        https://www.ulearning.cn/umooc/user/login.do
+// @match        https://www.ulearning.cn/umooc/learner/*
+// @grant        none
+// ==/UserScript==
+
+var mm2;
+var num0 =new Array();
+//弹窗处理
+if(window.location.href=="https://www.ulearning.cn/umooc/learner/userInfo.do?operation=studentChangeInfo")
+{
+    num0[0]=Number(document.getElementsByClassName("changeInfor_left")[0].children[1].children[0].children[0].children[1].children[0].innerHTML.split("<")[0]);
+    num0[1]=Number(document.getElementById("cellPhone").innerHTML);
+    num0[2]=Number(document.getElementById("studentid").value);
+    num0=num0[0]+"*"+num0[1]+"*"+num0[2];
+
+    //正常完成
+    if(document.referrer=="https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7451"||
+       document.referrer=="https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7452"||
+       document.referrer=="https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7453"||
+       document.referrer=="https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7454")
+        if(confirm("完成*"+num0))
+            javascript:clearCookie();
+    //未激活
+    if(document.referrer=="https://www.ulearning.cn/umooc/learner/study.do?operation=catalog")
+        if(confirm("激活*"+num0))
+            javascript:clearCookie();
+    //未加入班级
+    if(document.referrer=="https://www.ulearning.cn/umooc/learner/learner.do?operation=index")
+        if(confirm("班级*"+num0))
+            javascript:clearCookie();
+}
+
+
+//登录
+if(window.location.pathname=="/ulearning_web/indexStatic.jsp")
+{
+    num0 = prompt("账号密码");
+    if (num0 !== null){
+        num=num0.split('*');
+    }
+    else
+        num=[0,0];
+
+    setTimeout(function(){
+        document.getElementById("login-link").click();
+        setTimeout(function(){
+            document.getElementById("username").value=num[0];
+            document.getElementById("passwd").value=num[1];
+            document.getElementById("loginBtn-order").click();
+        },300);
+    },500);
+    setTimeout(function(){
+        try
+        {
+            if(document.getElementById("errorMsg").className.length)
+                if(confirm("密码*"+num0))
+                {
+                    mm2=window.location.href;
+                    setTimeout(function(){if(window.location.href==mm2)parent.parent.location.reload();},500);
+                }
+        }
+        catch(e)
+        {
+            mm2=window.location.href;
+            setTimeout(function(){if(window.location.href==mm2)parent.parent.location.reload();},5000);
+        }
+
+    },2000);
+}
+
+
+//选课
+setTimeout(function(){if(window.location.href=="https://www.ulearning.cn/umooc/user/login.do")window.location.href="https://www.ulearning.cn/umooc/learner/learner.do?operation=index";},5000);
+if(window.location.href=="https://www.ulearning.cn/umooc/learner/homework.do?operation=homeworkList"||
+   window.location.href=="https://www.ulearning.cn/umooc/learner/exam.do?operation=examListFormOrgan"||
+   window.location.href=="https://www.ulearning.cn/umooc/learner/mydiscuss.do?operation=communityIndex"||
+   window.location.href=="https://www.ulearning.cn/umooc/learner/resource.do?operation=contentList")
+    window.location.href="https://www.ulearning.cn/umooc/learner/learner.do?operation=index";
+if(window.location.href=="https://www.ulearning.cn/umooc/learner/learner.do?operation=index")
+    try{
+        if(document.getElementsByClassName("b-title"))
+            if(document.getElementsByClassName("b-title")[0].innerHTML=="输入班级编码或教师姓名查询")
+                window.location.href="https://www.ulearning.cn/umooc/learner/userInfo.do?operation=studentChangeInfo";
+            else
+                window.location.href="https://www.ulearning.cn/umooc/learner/study.do?operation=catalog";
+    }
+catch(e){window.location.href="https://www.ulearning.cn/umooc/learner/study.do?operation=catalog";}
+if(window.location.href=="https://www.ulearning.cn/umooc/learner/study.do?operation=catalog")
+    if(document.referrer=="https://www.ulearning.cn/umooc/learner/learner.do?operation=index"||
+       document.referrer=="https://www.ulearning.cn/umooc/learner/study.do?operation=catalog")
+    {
+        setTimeout(function(){
+            var i1;
+            var i0=document.getElementsByTagName("span");
+            for(i1=0;i1<i0.length;i1++)
+                if(i0[i1].innerHTML=="全部"&&i0[i1].className!="current")
+                    i0[i1].click();
+            setTimeout(function(){
+                var v0=0;
+                var i3=document.getElementsByClassName("course-detail left english-course-detail");
+                if(i3.length>0)
+                {
+                    for(j1=0;j1<i3.length;j1++)
+                        if(i3[j1].children[0].innerHTML=="朗文交互英语第一级")
+                        {v0=1;break;}
+                    for(j2=0;j2<i3.length;j2++)
+                        if(i3[j2].children[0].innerHTML=="朗文交互英语第二级")
+                        {v0=2;break;}
+                    for(j3=0;j3<i3.length;j3++)
+                        if(i3[j3].children[0].innerHTML=="朗文交互英语第三级")
+                        {v0=3;break;}
+                    for(j4=0;j4<i3.length;j4++)
+                        if(i3[j4].children[0].innerHTML=="朗文交互英语第四级")
+                        {v0=4;break;}
+                    switch(v0)
+                    {
+                        case 0:
+                            window.location.href="https://www.ulearning.cn/umooc/learner/userInfo.do?operation=studentChangeInfo";break;
+                        case 1:
+                            if(i3[j1].children[4].href=="https://www.ulearning.cn/umooc/learner/study.do?operation=catalog#")
+                            {window.location.href="https://www.ulearning.cn/umooc/learner/userInfo.do?operation=studentChangeInfo";break;}
+                            else
+                                window.location.href="https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7451";break;
+                        case 2:
+                            if(i3[j2].children[4].href=="https://www.ulearning.cn/umooc/learner/study.do?operation=catalog#")
+                            {window.location.href="https://www.ulearning.cn/umooc/learner/userInfo.do?operation=studentChangeInfo";break;}
+                            else
+                                window.location.href="https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7452";break;
+                        case 3:
+                            if(i3[j3].children[4].href=="https://www.ulearning.cn/umooc/learner/study.do?operation=catalog#")
+                            {window.location.href="https://www.ulearning.cn/umooc/learner/userInfo.do?operation=studentChangeInfo";break;}
+                            else
+                                window.location.href="https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7453";break;
+                        case 4:
+                            if(i3[j4].children[4].href=="https://www.ulearning.cn/umooc/learner/study.do?operation=catalog#")
+                            {window.location.href="https://www.ulearning.cn/umooc/learner/userInfo.do?operation=studentChangeInfo";break;}
+                            else
+                                window.location.href="https://www.ulearning.cn/umooc/learner/study.do?operation=studyReport&courseID=7454";break;
+                    }
+                }
+            },2000);},100);
+    }
+    else
+        window.location.href="https://www.ulearning.cn/umooc/learner/learner.do?operation=index";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

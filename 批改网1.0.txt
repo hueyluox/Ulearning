@@ -1,0 +1,39 @@
+// ==UserScript==
+// @name         pgw
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://www.pigai.org/*
+// @match        http://www.pigai.org/*
+// @grant        none
+// ==/UserScript==
+
+var cont;
+if((window.location.href.substring(0,31)=="https://www.pigai.org/index.php"
+   ||window.location.href.substring(0,30)=="http://www.pigai.org/index.php")
+   &&document.getElementById("contents"))
+
+{
+    document.getElementById("contents").style.display='none';
+    document.getElementById("dafen").style.display='none';
+    document.getElementById("bzbtn").style.display='none';
+
+    var cont1=document.createElement("textarea");
+    cont1.setAttribute("align","center");
+    cont1.setAttribute("style","width:100%");
+    cont1.style.height="180%";
+    var info1 = document.getElementById("contentsW_bar");
+    info1.appendChild(cont1);
+    cont1.value=document.getElementById("contents").value;
+
+    var cont2=document.createElement("button");
+    cont2.setAttribute("class","d3");
+    cont2.setAttribute("style","width:94px");
+    cont2.style.background="#cf6809";
+    cont2.style.height="40px";
+    cont2.innerHTML="提交作文";
+    cont2.onclick=function(){document.getElementById("contents").value=cont1.value;document.getElementById("dafen").type="button";document.getElementById("dafen").click();};
+    var info2 = document.getElementById("requestWForm").children[5].children[1];
+    info2.appendChild(cont2);
+}
